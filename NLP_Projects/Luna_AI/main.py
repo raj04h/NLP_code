@@ -8,7 +8,7 @@ import weathers
 import gem
 import news
 import music
-import visual_feed
+
 
 # global variable to track whether assistant should stop 
 stop_assistant = False
@@ -57,10 +57,12 @@ def process_cmd(cmd):
     elif "date" in cmd.lower():
         sdate, _ =get_dt() #_ this is used to ignore placeholder value
         speak(f"Today's date is {sdate}")
+        print(sdate)
 
     elif "time" in cmd.lower():
         _, stime = get_dt()
         speak(f"The current time is {stime}")
+        print(stime)
 
 
     elif "weather" in cmd.lower():
@@ -68,24 +70,13 @@ def process_cmd(cmd):
     
         weather_info = weathers.get_weather(city)
         speak(weather_info)
-
-    elif "show visual feedback" in cmd.lower():
-        data = [1, 2, 3, 4, 5]  # Sample data
-        visual_feed.show_visual(data)
-
-
-    #elif "run vscode" in cmd.lower():
-    #   os.startfile(r"C:\Users\himan\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Visual Studio Code\Visual Studio Code.lnk")
-
-       
+        print(weather_info)
     else:
         # Call gimmini for other commands
         output = gem.gimmini(cmd)
         print(output)
         speak(output)
-
-
-
+    
 
 # Main assistant code
 if __name__ == '__main__': #to prevent certain code from running when the script is imported as a module. 
@@ -119,8 +110,8 @@ if __name__ == '__main__': #to prevent certain code from running when the script
                     speak("ok wait...")
                     process_cmd(command)
 
-            elif word.lower() == "luna stop": 
-                speak("Deactivated. Goodbye!")
+            elif word.lower() == "luna stop":
+                speak("Deactivated. Goodbye Himanshu!")
                 break
             
         except sr.UnknownValueError:
