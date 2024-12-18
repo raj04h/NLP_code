@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Flask Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; }
+        #response { margin-top: 20px; font-size: 18px; color: rgb(45, 206, 45); }
+    </style>
+</head>
+<body>
+    <h1>Simple Assistant</h1>
+    <button id="start-btn">Start</button>
+    <button id="stop-btn">Stop</button>
+    <div id="response"></div>
+
+    <script>
+        document.getElementById("start-btn").addEventListener("click", () => {
+            fetch('/start', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("response").innerText = data.response;
+            });
+        });
+
+        document.getElementById("stop-btn").addEventListener("click", () => {
+            fetch('/stop', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("response").innerText = data.response;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -8,6 +8,7 @@ import weathers
 import gem
 import news
 import music
+import pyjokes
 
 
 # global variable to track whether assistant should stop 
@@ -27,7 +28,6 @@ def speak(text):
 
 def get_dt():
     Now=datetime.datetime.now()
-
     sdate=Now.strftime("%A, %B %d, %Y")  # Format: Day, Month Date, Year
     stime=Now.strftime("%I:%M %p")  # Format: Hour:Minute AM/PM
     return sdate,stime
@@ -63,14 +63,30 @@ def process_cmd(cmd):
         _, stime = get_dt()
         speak(f"The current time is {stime}")
         print(stime)
-
-
+        
     elif "weather" in cmd.lower():
         city = cmd.lower().split("weather in ")[1].strip()
     
         weather_info = weathers.get_weather(city)
         speak(weather_info)
         print(weather_info)
+
+    
+    elif "joke" in cmd.lower():
+        joke = pyjokes.get_joke()
+        speak(joke)
+        print(joke)
+
+    elif "write note" in cmd.lower():
+        speak("What should I write down?")
+        with sr.Microphone() as source:
+            note = r.listen(source)
+            note_text = r.recognize_google(note)
+        
+        with open("notes.txt", "a") as file:
+            file.write(f"{datetime.datetime.now()}: {note_text}\n")
+        speak("Note saved successfully!")
+
     else:
         # Call gimmini for other commands
         output = gem.gimmini(cmd)
@@ -79,8 +95,21 @@ def process_cmd(cmd):
     
 
 # Main assistant code
+
+def greet_user():
+    hour = datetime.datetime.now().hour
+    if 5 <= hour < 12:
+        return "Good morning!"
+    elif 12 <= hour < 17:
+        return "Good afternoon!"
+    elif 17 <= hour < 21:
+        return "Good evening!"
+    else:
+        return "Hey!"
+
 if __name__ == '__main__': #to prevent certain code from running when the script is imported as a module. 
-    speak("Assistant activated...")
+    greeting = greet_user()
+    speak(f"{greeting} Assistant activated...")
 
     # Listen only when the word is spoken
     while True:
@@ -115,6 +144,6 @@ if __name__ == '__main__': #to prevent certain code from running when the script
                 break
             
         except sr.UnknownValueError:
-            print("Could not understand audio")
+            speak("Sorry,Can you repeat it?")
         except sr.RequestError as e:
-            print(f"Error: {e}")
+            speak("Unable to connect to the speech recognition service")
