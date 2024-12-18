@@ -2,7 +2,7 @@ import requests
 
 stop_assistent = False
 
-API_key = "c527c77c8234a895aa64aae761b156fc"
+API_KEY = ""# Use here yoour key
 
 def get_news(speak):
     url = requests.get(f"https://newsapi.org/v2/top-headlines?country=in&apiKey={API_key}")
