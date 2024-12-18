@@ -32,66 +32,60 @@ def get_dt():
     stime=Now.strftime("%I:%M %p")  # Format: Hour:Minute AM/PM
     return sdate,stime
 
-
 def process_cmd(cmd):
     if "open" in cmd.lower():
-        site = cmd.lower().split("open ")[1].strip()  #[1]->Selects the second element of the list ["", "instagram"]
-        wb.open_new_tab(f"https://www.{site}.com") # because the first element (index 0) is the part before "open ", and the second element (index 1) is the part after "open ".
-        speak(f"Opening {site}...")
-
+        site = cmd.lower().split("open ")[1].strip()
+        wb.open_new_tab(f"https://www.{site}.com")
+        response = f"Opening {site}..."
+    
     elif "play" in cmd.lower():
         if "playlist" in cmd.lower():
-            song,link=random.choice(list(music.playlist.items()))
+            song, link = random.choice(list(music.playlist.items()))
             wb.open_new_tab(link)
-            speak(f"playing {song}")
-
+            response = f"Playing {song}"
         else:
-            Song=cmd.lower().split("play ")[1].strip()
-            wb.open(f"https://www.youtube.com/results?search_query={Song}")
-
+            song = cmd.lower().split("play ")[1].strip()
+            wb.open(f"https://www.youtube.com/results?search_query={song}")
+            response = f"Playing {song} on YouTube."
 
     elif "play news" in cmd.lower():
-        speak("Fetching the latest news")
+        response = "Fetching the latest news."
         news.get_news(speak)
 
     elif "date" in cmd.lower():
-        sdate, _ =get_dt() #_ this is used to ignore placeholder value
-        speak(f"Today's date is {sdate}")
-        print(sdate)
+        sdate, _ = get_dt()
+        response = f"Today's date is {sdate}"
 
     elif "time" in cmd.lower():
         _, stime = get_dt()
-        speak(f"The current time is {stime}")
-        print(stime)
-        
+        response = f"The current time is {stime}"
+
     elif "weather" in cmd.lower():
         city = cmd.lower().split("weather in ")[1].strip()
-    
         weather_info = weathers.get_weather(city)
-        speak(weather_info)
-        print(weather_info)
+        response = weather_info
 
-    
     elif "joke" in cmd.lower():
         joke = pyjokes.get_joke()
-        speak(joke)
-        print(joke)
+        response = joke
 
     elif "write note" in cmd.lower():
-        speak("What should I write down?")
+        response = "What should I write down?"
         with sr.Microphone() as source:
             note = r.listen(source)
             note_text = r.recognize_google(note)
-        
+
         with open("notes.txt", "a") as file:
             file.write(f"{datetime.datetime.now()}: {note_text}\n")
-        speak("Note saved successfully!")
+        response = "Note saved successfully!"
 
     else:
-        # Call gimmini for other commands
-        output = gem.gimmini(cmd)
-        print(output)
-        speak(output)
+        response = gem.gimmini(cmd)
+
+    print(response)
+    speak(response)
+    return response
+
     
 
 # Main assistant code

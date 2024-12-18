@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, jsonify
 import speech_recognition as sr
 import pyttsx3
-from  main import process_cmd
+from main import process_cmd
 
 app = Flask(__name__)
 
@@ -34,17 +34,24 @@ def index():
 
 @app.route('/start', methods=['POST'])
 def start():
-    user_command = recognize_speech()  # Start listening
-    print(f"Recognized Command: {user_command}")
+    try:
+        # Recognize User's Command
+        user_command = recognize_speech()
+        print(f"Recognized Command: {user_command}")
 
-    # Process Command and Get Response
-    chatbot_response = process_cmd(user_command)
+        # Process Command and Get Response
+        chatbot_response = process_cmd(user_command)
+        response_text = chatbot_response if chatbot_response else "Command processed successfully."
 
-    # Speak the Response
-    speak(chatbot_response)
+        # Speak the Response
+        speak(response_text)
 
-    # Send Response to Frontend
-    return jsonify({"response": chatbot_response})
+        # Send Response to Frontend
+        return jsonify({"response": response_text})
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"response": "An error occurred while processing the command."})
 
 @app.route('/stop', methods=['POST'])
 def stop():

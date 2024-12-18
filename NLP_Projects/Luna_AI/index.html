@@ -22,6 +22,10 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById("response").innerText = data.response;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                document.getElementById("response").innerText = "Error occurred!";
             });
         });
 
