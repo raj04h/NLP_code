@@ -8,31 +8,31 @@ import gem
 import news
 import music
 import pyjokes
+import time
 
-# Initial tracking of assistant
-stop_assistant = False
-
-# text to speech
-engine = pyttsx3.init()
-
-# produce speech
+# produce speech (engine re-init every call so it never hangs)
 def speak(text):
+    print(f"Luna says: {text}")  # debug
+    engine = pyttsx3.init()
     engine.setProperty('rate', 200)  # Speed of speech
-    tone = engine.getProperty('voices')  # Getting details of current voice
-    engine.setProperty('voice', tone[1].id)  # Setting female voice (0 for male, 1 for female)
-    engine.setProperty('volume', 1)  # Volume should be between 0 and 1
+    engine.setProperty('volume', 1)  # Volume between 0 and 1
+    voices = engine.getProperty('voices')
+    if len(voices) > 1:
+        engine.setProperty('voice', voices[1].id)  # female
     engine.say(text)
     engine.runAndWait()
+    engine.stop()
 
 # to get current date and time
 def get_dt():
     now = datetime.datetime.now()
     date_str = now.strftime("%A, %B %d, %Y")  # Format: Day, Month Date, Year
-    time_str = now.strftime("%I:%M %p")  # Format: Hour:Minute AM/PM
+    time_str = now.strftime("%I:%M %p")       # Format: Hour:Minute AM/PM
     return date_str, time_str
 
 # to process user commands
 def process_cmd(cmd):
+    response = "I didn't quite get that."  # fallback
     try:
         cmd = cmd.lower()
         if "open" in cmd:
@@ -71,8 +71,7 @@ def process_cmd(cmd):
             response = pyjokes.get_joke()
 
         elif "write note" in cmd.lower():
-            response = "What should I write down?"
-            speak(response)
+            speak("What should I write down?")
             with sr.Microphone() as source:
                 note = recognizer.listen(source)
                 note_text = recognizer.recognize_google(note)
@@ -81,16 +80,14 @@ def process_cmd(cmd):
                 file.write(f"{datetime.datetime.now()}: {note_text}\n")
             response = "Note saved successfully!"
 
-# Gemmini API for LLM model response
         else:
             response = gem.gimmini(cmd)
 
-        print(response)
-        speak(response)
-
     except Exception as e:
         print(f"Error processing command: {e}")
-        speak("Something went wrong while processing your request.")
+        response = "Something went wrong while processing your request."
+
+    return response
 
 # to greet based on the time of day
 def greet_user():
@@ -104,13 +101,13 @@ def greet_user():
     else:
         return "Hey!"
 
-# Starting of Assistent
+# Starting of Assistant
 if __name__ == '__main__':
     recognizer = sr.Recognizer() 
     greeting = greet_user()
     speak(f"{greeting} Assistant activated...")
 
-# Continuous listening for commands
+    # Continuous listening for commands
     while True:
         print("Recognizing...")
 
@@ -123,28 +120,32 @@ if __name__ == '__main__':
             word = recognizer.recognize_google(audio).lower()
             print(f"Recognized word: {word}")
 
-# Luna Word detected
-            if word == "luna":
+            # Luna Word detected
+            if word == "mona":
                 speak("Hey, tell me")
+                time.sleep(0.5)  # pause so TTS finishes
 
                 with sr.Microphone() as source:
-                    command_audio = recognizer.listen(source, phrase_time_limit=5 )
+                    command_audio = recognizer.listen(source, phrase_time_limit=5)
+
                 try:
                     command = recognizer.recognize_google(command_audio)
                     speak("Okay, wait...")
-                    process_cmd(command)
+                    response = process_cmd(command)
+                    speak(response)
                 except sr.UnknownValueError:
                     speak("Sorry, I didn't catch that. Can you repeat?")
                 except sr.RequestError:
                     speak("Unable to connect to service.")
-# Luna stop detected
-            elif word == "luna stop":
+
+            # Luna stop detected
+            elif word == "mona stop":
                 speak("Deactivated. Goodbye Himanshu!")
                 break
 
         except sr.UnknownValueError:
             speak("Sorry, I didn't hear that clearly.")
-        except sr.RequestError as e:
+        except sr.RequestError:
             speak("Unable to connect to service.")
         except Exception as e:
             print(f"Unexpected error: {e}")

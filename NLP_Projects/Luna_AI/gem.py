@@ -1,6 +1,6 @@
 import google.generativeai as genai
 
-API_KEY = ""# Use here yoour key
+API_KEY = "AIzaSyB5YhK-9aAklDGJy0xxjg8mVm1FVJJBYy4"# Use here yoour key
 
 def configure_api():
     genai.configure(api_key=API_KEY)
@@ -12,3 +12,5 @@ def gimmini(response):
     response = model.generate_content(response)
 
     return response.text  # Ensure this is correct
+
+
