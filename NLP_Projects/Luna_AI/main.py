@@ -121,7 +121,7 @@ if __name__ == '__main__':
             print(f"Recognized word: {word}")
 
             # Luna Word detected
-            if word == "mona":
+            if word == "Lisa":
                 speak("Hey, tell me")
                 time.sleep(0.5)  # pause so TTS finishes
 
